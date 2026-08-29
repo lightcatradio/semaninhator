@@ -142,6 +142,21 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
+# dependencies
 node_modules/
+**/node_modules/
+
+# env
 .env
+**/.env
+
+# expo
 .expo/
+app/.expo/
+
+# build
+dist/
+build/
+
+# os
+.DS_Store
