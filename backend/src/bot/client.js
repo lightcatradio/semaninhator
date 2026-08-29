@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits } from "discord.js";
+import * as gridCommand from "./commands/grid.js";
 
 const client = new Client({
   intents: [
@@ -12,11 +13,11 @@ client.once("ready", () => {
   console.log(`Conectado como ${client.user.tag}`);
 });
 
-client.on("messageCreate", (message) => {
-  if (message.author.bot) return;
+client.on("interactionCreate", async (interaction) => {
+  if (!interaction.isChatInputCommand()) return;
 
-  if (message.content === "ping") {
-    message.reply("pong");
+  if (interaction.commandName === "grid") {
+    await gridCommand.execute(interaction);
   }
 });
 
