@@ -1,8 +1,8 @@
 import "dotenv/config";
 import { REST, Routes } from "discord.js";
-import * as gridCommand from "./bot/commands/grid.js";
+import * as semaninhaCommand from "./bot/commands/semaninha.js";
 
-const commands = [gridCommand.data.toJSON()];
+const commands = [semaninhaCommand.data.toJSON()];
 
 const rest = new REST().setToken(process.env.DISCORD_BOT_TOKEN);
 

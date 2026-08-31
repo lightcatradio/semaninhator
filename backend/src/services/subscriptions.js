@@ -6,22 +6,22 @@ export async function createSubscription({
   guildId,
   channelId,
   lastfmUsername,
-  period,
-  frequency,
+  dayOfWeek,
+  time,
   createdBy,
 }) {
   const docRef = await collection.add({
     guildId,
     channelId,
     lastfmUsername,
-    period,
-    frequency,
+    dayOfWeek,
+    time,
     active: true,
     lastPostedAt: null,
     createdBy,
     createdAt: new Date(),
   });
-  return { id: docRef.id, lastfmUsername, period, frequency };
+  return { id: docRef.id, lastfmUsername, dayOfWeek, time };
 }
 
 export async function listSubscriptionsByGuild(guildId) {
@@ -29,27 +29,12 @@ export async function listSubscriptionsByGuild(guildId) {
     .where("guildId", "==", guildId)
     .where("active", "==", true)
     .get();
-
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
-const INTERVAL_MS = {
-  daily: 24 * 60 * 60 * 1000,
-  weekly: 7 * 24 * 60 * 60 * 1000,
-  monthly: 30 * 24 * 60 * 60 * 1000,
-};
-
-export async function listDueSubscriptions() {
+export async function listAllActiveSubscriptions() {
   const snapshot = await collection.where("active", "==", true).get();
-  const now = Date.now();
-
-  return snapshot.docs
-    .map((doc) => ({ id: doc.id, ...doc.data() }))
-    .filter((sub) => {
-      if (!sub.lastPostedAt) return true;
-      const lastPosted = sub.lastPostedAt.toDate().getTime();
-      return now - lastPosted >= INTERVAL_MS[sub.frequency];
-    });
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
 export async function markAsPosted(id) {

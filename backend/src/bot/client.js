@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits } from "discord.js";
-import * as gridCommand from "./commands/grid.js";
+import * as semaninhaCommand from "./commands/semaninha.js";
 
 const client = new Client({
   intents: [
@@ -15,9 +15,8 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
-
-  if (interaction.commandName === "grid") {
-    await gridCommand.execute(interaction);
+  if (interaction.commandName === "semaninha") {
+    await semaninhaCommand.execute(interaction);
   }
 });
 

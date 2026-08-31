@@ -3,34 +3,58 @@ import { AttachmentBuilder } from "discord.js";
 import { getTopAlbums } from "../services/lastfm.js";
 import { generateGridImage } from "../services/grid-image.js";
 import {
-  listDueSubscriptions,
+  listAllActiveSubscriptions,
   markAsPosted,
 } from "../services/subscriptions.js";
 
-export async function checkAndPostDueSubscriptions(client) {
-  console.log("Checando automações pendentes...");
-  const due = await listDueSubscriptions();
+const TIMEZONE = "America/Sao_Paulo";
 
-  for (const sub of due) {
-    try {
-      const channel = await client.channels.fetch(sub.channelId);
-      const albums = await getTopAlbums(sub.lastfmUsername, sub.period);
-      const buffer = await generateGridImage(albums);
-      const attachment = new AttachmentBuilder(buffer, { name: "grid.png" });
+const activeTasks = new Map();
 
-      await channel.send({
-        content: `Grid automático de **${sub.lastfmUsername}** (${sub.period})`,
-        files: [attachment],
-      });
-      await markAsPosted(sub.id);
-      console.log(`Postado grid da automação #${sub.id}`);
-    } catch (error) {
-      console.error(`Falha na automação #${sub.id}:`, error.message);
-    }
+async function postSemaninha(client, sub) {
+  try {
+    const channel = await client.channels.fetch(sub.channelId);
+    const albums = await getTopAlbums(sub.lastfmUsername, "7day");
+    const buffer = await generateGridImage(albums, {
+      username: sub.lastfmUsername,
+      period: "7day",
+    });
+    const attachment = new AttachmentBuilder(buffer, { name: "semaninha.png" });
+
+    await channel.send({
+      content: `📊 Semaninha de **${sub.lastfmUsername}**`,
+      files: [attachment],
+    });
+    await markAsPosted(sub.id);
+    console.log(`✅ Semaninha postada (#${sub.id})`);
+  } catch (error) {
+    console.error(`❌ Falha ao postar semaninha #${sub.id}:`, error.message);
   }
 }
 
-export function startScheduler(client) {
-  cron.schedule("0 * * * *", () => checkAndPostDueSubscriptions(client));
-  console.log("Scheduler iniciado (checagem a cada hora)");
+export function scheduleSubscription(client, sub) {
+  const [hour, minute] = sub.time.split(":").map(Number);
+  const pattern = `${minute} ${hour} * * ${sub.dayOfWeek}`; // ex: "0 18 * * 5" = toda sexta às 18:00
+
+  const task = cron.schedule(pattern, () => postSemaninha(client, sub), {
+    timezone: TIMEZONE,
+  });
+  activeTasks.set(sub.id, task);
+  console.log(
+    `🕐 Agendado #${sub.id}: ${sub.lastfmUsername} — dia ${sub.dayOfWeek} às ${sub.time}`
+  );
+}
+
+export function unscheduleSubscription(id) {
+  const task = activeTasks.get(id);
+  if (task) {
+    task.stop();
+    activeTasks.delete(id);
+  }
+}
+
+export async function loadAndScheduleAll(client) {
+  const subscriptions = await listAllActiveSubscriptions();
+  subscriptions.forEach((sub) => scheduleSubscription(client, sub));
+  console.log(`🕐 ${subscriptions.length} semaninha(s) agendada(s) ao iniciar`);
 }

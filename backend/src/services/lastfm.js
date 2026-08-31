@@ -1,6 +1,6 @@
 const BASE_URL = "http://ws.audioscrobbler.com/2.0/";
 
-export async function getTopAlbums(username, period = "overall") {
+export async function getTopAlbums(username, period = "7day") {
   const params = new URLSearchParams({
     method: "user.getTopAlbums",
     user: username,
