@@ -103,9 +103,7 @@ async function handleGerar(interaction) {
     });
   } catch (error) {
     console.error(error);
-    await interaction.editReply(
-      `❌ Erro ao gerar a semaninha: ${error.message}`
-    );
+    await interaction.editReply(`Erro ao gerar a semaninha: ${error.message}`);
   }
 }
 
@@ -116,7 +114,7 @@ async function handleAgendar(interaction) {
 
   if (!TIME_REGEX.test(time)) {
     return interaction.reply({
-      content: "❌ Horário inválido. Use formato 24h, ex: `18:00`.",
+      content: "Horário inválido. Use formato 24h, ex: `18:00`.",
       ephemeral: true,
     });
   }
@@ -135,7 +133,7 @@ async function handleAgendar(interaction) {
   scheduleSubscription(interaction.client, subscription); // agenda na hora, sem precisar reiniciar
 
   await interaction.editReply(
-    `✅ Semaninha agendada (id: ${subscription.id}). Vou postar o grid de **${username}** toda ${DAY_LABELS[dayOfWeek]} às ${time}.`
+    `Semaninha agendada (id: ${subscription.id}). Vou postar o grid de **${username}** toda ${DAY_LABELS[dayOfWeek]} às ${time}.`
   );
 }
 
@@ -161,6 +159,6 @@ async function handleDesativar(interaction) {
   const success = await deactivateSubscription(id, interaction.guildId);
   if (success) unscheduleSubscription(id);
   await interaction.editReply(
-    success ? `⏸️ Semaninha #${id} desativada.` : `❌ Semaninha não encontrada.`
+    success ? `Semaninha #${id} desativada.` : `Semaninha não encontrada.`
   );
 }

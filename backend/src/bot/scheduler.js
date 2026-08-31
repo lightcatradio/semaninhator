@@ -22,26 +22,26 @@ async function postSemaninha(client, sub) {
     const attachment = new AttachmentBuilder(buffer, { name: "semaninha.png" });
 
     await channel.send({
-      content: `📊 Semaninha de **${sub.lastfmUsername}**`,
+      content: `Semaninha de **${sub.lastfmUsername}**`,
       files: [attachment],
     });
     await markAsPosted(sub.id);
-    console.log(`✅ Semaninha postada (#${sub.id})`);
+    console.log(`Semaninha postada (#${sub.id})`);
   } catch (error) {
-    console.error(`❌ Falha ao postar semaninha #${sub.id}:`, error.message);
+    console.error(`Falha ao postar semaninha #${sub.id}:`, error.message);
   }
 }
 
 export function scheduleSubscription(client, sub) {
   const [hour, minute] = sub.time.split(":").map(Number);
-  const pattern = `${minute} ${hour} * * ${sub.dayOfWeek}`; // ex: "0 18 * * 5" = toda sexta às 18:00
+  const pattern = `${minute} ${hour} * * ${sub.dayOfWeek}`;
 
   const task = cron.schedule(pattern, () => postSemaninha(client, sub), {
     timezone: TIMEZONE,
   });
   activeTasks.set(sub.id, task);
   console.log(
-    `🕐 Agendado #${sub.id}: ${sub.lastfmUsername} — dia ${sub.dayOfWeek} às ${sub.time}`
+    `Agendado #${sub.id}: ${sub.lastfmUsername} — dia ${sub.dayOfWeek} às ${sub.time}`
   );
 }
 
@@ -56,5 +56,5 @@ export function unscheduleSubscription(id) {
 export async function loadAndScheduleAll(client) {
   const subscriptions = await listAllActiveSubscriptions();
   subscriptions.forEach((sub) => scheduleSubscription(client, sub));
-  console.log(`🕐 ${subscriptions.length} semaninha(s) agendada(s) ao iniciar`);
+  console.log(`${subscriptions.length} semaninha(s) agendada(s) ao iniciar`);
 }
