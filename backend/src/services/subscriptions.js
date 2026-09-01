@@ -1,4 +1,5 @@
 import { db } from "../lib/firebase.js";
+import { FieldValue } from "firebase-admin/firestore";
 
 const collection = db.collection("subscriptions");
 
@@ -39,6 +40,7 @@ export async function createSubscription({
     dayOfWeek,
     time,
     active: true,
+    postCount: 0,
     lastPostedAt: null,
     createdBy,
     createdAt: new Date(),
@@ -71,4 +73,11 @@ export async function deactivateSubscription(id, guildId) {
   if (!doc.exists || doc.data().guildId !== guildId) return false;
   await collection.doc(id).update({ active: false });
   return true;
+}
+
+export async function incrementPostCount(id) {
+  const ref = collection.doc(id);
+  await ref.update({ postCount: FieldValue.increment(1) });
+  const doc = await ref.get();
+  return doc.data().postCount;
 }

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, AttachmentBuilder } from "discord.js";
-import { getTopAlbums } from "../../services/lastfm.js";
+import { getTopAlbums, getWeeklyStats } from "../../services/lastfm.js";
 import { generateGridImage } from "../../services/grid-image.js";
 import {
   createSubscription,
@@ -7,6 +7,7 @@ import {
   deactivateSubscription,
 } from "../../services/subscriptions.js";
 import { scheduleSubscription, unscheduleSubscription } from "../scheduler.js";
+import { buildSemaninhaMessage } from "../../services/semaninha-message.js";
 
 const DAY_CHOICES = [
   { name: "Domingo", value: "0" },
@@ -92,15 +93,18 @@ async function handleGerar(interaction) {
 
   try {
     const albums = await getTopAlbums(username, "7day");
+    const stats = await getWeeklyStats(username);
     const buffer = await generateGridImage(albums, {
       username,
       period: "7day",
     });
     const attachment = new AttachmentBuilder(buffer, { name: "semaninha.png" });
-    await interaction.editReply({
-      content: `Semaninha de **${username}**`,
-      files: [attachment],
+    const content = buildSemaninhaMessage({
+      username,
+      weekNumber: null,
+      stats,
     });
+    await interaction.editReply({ content, files: [attachment] });
   } catch (error) {
     console.error(error);
     await interaction.editReply(`Erro ao gerar a semaninha: ${error.message}`);
