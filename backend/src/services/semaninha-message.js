@@ -39,11 +39,9 @@ export function buildSemaninhaMessage({ username, weekNumber, stats }) {
     : `Semaninha de ${username} (${dateRange})`;
 
   return [
-    "```",
-    `${header} ---------------------------`,
-    `Scrobbles: ${stats.totalScrobbles} | Albums: ${stats.totalAlbums} | Artistas: ${stats.totalArtists}`,
-    `Tags mais ouvidas: ${tagsLine}`,
-    `Média de scrobbles por dia: ${avgPerDay} | Tempo total ouvido: ${listenedLabel}`,
-    "```",
+    `**${header}** =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=`,
+    `Scrobbles: **${stats.totalScrobbles}** | Albums: **${stats.totalAlbums}** | Artistas: **${stats.totalArtists}**`,
+    `Tags mais ouvidas: **${tagsLine}**`,
+    `Média de scrobbles por dia: **${avgPerDay}** | Tempo total ouvido: **${listenedLabel}**`,
   ].join("\n");
 }
