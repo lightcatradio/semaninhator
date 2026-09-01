@@ -21,7 +21,18 @@ export async function createSubscription({
     createdBy,
     createdAt: new Date(),
   });
-  return { id: docRef.id, lastfmUsername, dayOfWeek, time };
+
+  return {
+    id: docRef.id,
+    guildId,
+    channelId,
+    lastfmUsername,
+    dayOfWeek,
+    time,
+    active: true,
+    lastPostedAt: null,
+    createdBy,
+  };
 }
 
 export async function listSubscriptionsByGuild(guildId) {
