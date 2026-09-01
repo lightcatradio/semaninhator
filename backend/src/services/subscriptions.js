@@ -2,6 +2,26 @@ import { db } from "../lib/firebase.js";
 
 const collection = db.collection("subscriptions");
 
+const ID_CHARS =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&";
+
+function generateId() {
+  let id = "";
+  for (let i = 0; i < 5; i++) {
+    id += ID_CHARS[Math.floor(Math.random() * ID_CHARS.length)];
+  }
+  return id;
+}
+
+async function generateUniqueId() {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const id = generateId();
+    const doc = await collection.doc(id).get();
+    if (!doc.exists) return id;
+  }
+  throw new Error("Não foi possível gerar um ID único após várias tentativas.");
+}
+
 export async function createSubscription({
   guildId,
   channelId,
@@ -10,7 +30,9 @@ export async function createSubscription({
   time,
   createdBy,
 }) {
-  const docRef = await collection.add({
+  const id = await generateUniqueId();
+
+  const data = {
     guildId,
     channelId,
     lastfmUsername,
@@ -20,19 +42,11 @@ export async function createSubscription({
     lastPostedAt: null,
     createdBy,
     createdAt: new Date(),
-  });
-
-  return {
-    id: docRef.id,
-    guildId,
-    channelId,
-    lastfmUsername,
-    dayOfWeek,
-    time,
-    active: true,
-    lastPostedAt: null,
-    createdBy,
   };
+
+  await collection.doc(id).set(data);
+
+  return { id, ...data };
 }
 
 export async function listSubscriptionsByGuild(guildId) {
