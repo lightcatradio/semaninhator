@@ -12,9 +12,12 @@ const client = new Client({
 client.once("ready", () => {
   console.log(`Conectado como ${client.user.tag}`);
 
-  client.user.setActivity("Seus scrobbles", {
-    type: ActivityType.Watching,
-  });
+  client.user.setActivity(
+    "👀 Stalkeando seus scrobbles... | /semaninha gerar",
+    {
+      type: ActivityType.Watching,
+    }
+  );
 });
 
 client.on("interactionCreate", async (interaction) => {
