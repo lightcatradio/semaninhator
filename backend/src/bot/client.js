@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, ActivityType } from "discord.js";
 import * as semaninhaCommand from "./commands/semaninha.js";
 
 const client = new Client({
@@ -11,6 +11,10 @@ const client = new Client({
 
 client.once("ready", () => {
   console.log(`Conectado como ${client.user.tag}`);
+
+  client.user.setActivity("Seus scrobbles", {
+    type: ActivityType.Watching,
+  });
 });
 
 client.on("interactionCreate", async (interaction) => {

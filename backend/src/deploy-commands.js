@@ -7,16 +7,13 @@ const commands = [semaninhaCommand.data.toJSON()];
 const rest = new REST().setToken(process.env.DISCORD_BOT_TOKEN);
 
 try {
-  console.log("Registrando slash commands...");
-  await rest.put(
-    Routes.applicationGuildCommands(
-      process.env.DISCORD_CLIENT_ID,
-      process.env.DISCORD_GUILD_ID
-    ),
-    { body: commands }
-  );
+  console.log("Registrando slash commands globalmente...");
 
-  console.log("Comandos registrados com sucesso.");
+  await rest.put(Routes.applicationCommands(process.env.DISCORD_CLIENT_ID), {
+    body: commands,
+  });
+
+  console.log("Comandos globais registrados com sucesso.");
 } catch (error) {
   console.error(error);
 }
