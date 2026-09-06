@@ -1,2 +1,2 @@
 # semaninhator
-App feito com o intuito de obter experiencia e aprender React Native enquanto resolvo um problema real que tenho no dia a dia.
+Acho que agora é apenas um bot do discord mesmo. Bot desenvolvido com um objetivo em mente: tornar o ritual de postar a semaninha toda semana algo mais prático.
