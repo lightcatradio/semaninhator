@@ -2,8 +2,9 @@ import { createCanvas, loadImage } from "@napi-rs/canvas";
 
 const TILE_SIZE = 300;
 const GRID_SIZE = 5;
+const FONT_SIZE = 16;
 
-export async function generateGridImage(albums) {
+export async function generateGridImage(albums, drawAlbumName = false, drawAlbumPlays = false) {
   const canvasSize = TILE_SIZE * GRID_SIZE;
   const canvas = createCanvas(canvasSize, canvasSize);
   const ctx = canvas.getContext("2d");
@@ -35,7 +36,50 @@ export async function generateGridImage(albums) {
       ctx.fillStyle = "#333333";
       ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
+      ctx.font = `${FONT_SIZE}px NotoSans, NotoSansJP, NotoSansKR, NotoSansSC, NotoSansTC, NotoColorEmoji, sans-serif`;
+      ctx.fillStyle = "white";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 3;
+      ctx.lineJoin = "round";
+      ctx.textBaseline = "top";
+      let nextLine = y;
+      if (drawAlbumName) {
+          nextLine = wrapText(ctx, `${album.name} - ${album.artist}`, x+4, nextLine + 4, TILE_SIZE-16, FONT_SIZE);
+      }
+      if (drawAlbumPlays) {
+          wrapText(ctx, `${album.playcount} scrobbles`, x+4, nextLine + 4, TILE_SIZE - 16, FONT_SIZE);
+      }
   });
-
   return canvas.toBuffer("image/png");
+}
+
+function wrapText(context, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(/\s+/);
+    let line = '';
+
+    for (const word of words) {
+        const testLine = line
+            ? `${line} ${word}`
+            : word;
+
+        if (
+            context.measureText(testLine).width > maxWidth &&
+            line
+        ) {
+            context.strokeText(line, x, y);
+            context.fillText(line, x, y);
+
+            line = word;
+            y += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+
+    if (line) {
+        context.strokeText(line, x, y);
+        context.fillText(line, x, y);
+    }
+
+    return y + lineHeight;
 }

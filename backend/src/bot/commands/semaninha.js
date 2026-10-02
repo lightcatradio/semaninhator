@@ -37,6 +37,16 @@ export const data = new SlashCommandBuilder()
           .setDescription("Username no Last.fm")
           .setRequired(true)
       )
+      .addBooleanOption((o) =>
+        o
+          .setName("names")
+          .setDescription("Escrever nome de cada álbum")
+      )
+      .addBooleanOption((o) =>
+        o
+          .setName("plays")
+          .setDescription("Escrever a quantidade de plays em cada álbum")
+      )
   )
   .addSubcommand((sub) =>
     sub
@@ -89,15 +99,15 @@ export async function execute(interaction) {
 
 async function handleGerar(interaction) {
   await interaction.deferReply();
-  const username = interaction.options.getString("username");
+    const username = interaction.options.getString("username");
+
+    const drawAlbumName  = interaction.options.getBoolean("names") ?? false;
+    const drawAlbumPlays = interaction.options.getBoolean("plays") ?? false;
 
   try {
     const albums = await getTopAlbums(username, "7day");
     const stats = await getWeeklyStats(username);
-    const buffer = await generateGridImage(albums, {
-      username,
-      period: "7day",
-    });
+      const buffer = await generateGridImage(albums, drawAlbumName, drawAlbumPlays);
     const attachment = new AttachmentBuilder(buffer, { name: "semaninha.png" });
     const content = buildSemaninhaMessage({
       username,
